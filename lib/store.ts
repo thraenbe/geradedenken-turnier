@@ -1,4 +1,4 @@
-import { head, put } from "@vercel/blob";
+import { BlobNotFoundError, BlobPreconditionFailedError, head, put } from "@vercel/blob";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { seedTournament } from "./seed";
@@ -14,13 +14,6 @@ interface ReadResult {
   etag: string | null;
 }
 
-function isNotFound(err: unknown): boolean {
-  return err instanceof Error && err.name.includes("NotFound");
-}
-
-function isPreconditionFailed(err: unknown): boolean {
-  return err instanceof Error && (err.name.includes("Precondition") || err.message.includes("precondition"));
-}
 
 async function readLocal(): Promise<ReadResult> {
   try {
@@ -52,7 +45,7 @@ async function readBlob(): Promise<ReadResult> {
   try {
     meta = await head(BLOB_PATH);
   } catch (err) {
-    if (!isNotFound(err)) throw err;
+    if (!(err instanceof BlobNotFoundError)) throw err;
     const tournament = seedTournament();
     try {
       await writeBlob(tournament, null);
@@ -63,7 +56,7 @@ async function readBlob(): Promise<ReadResult> {
     if (!meta) return { tournament, etag: null };
   }
   // ETag als Query-Parameter umgeht den CDN-Cache für überschriebene Blobs.
-  const etag = (meta as { etag?: string }).etag ?? String(meta.uploadedAt?.getTime() ?? "");
+  const etag = meta.etag;
   const res = await fetch(`${meta.url}?v=${encodeURIComponent(etag)}`, { cache: "no-store" });
   if (!res.ok) throw new Error(`Blob-Lesefehler: ${res.status}`);
   return { tournament: (await res.json()) as Tournament, etag };
@@ -95,7 +88,7 @@ export async function updateTournament(mutate: (t: Tournament) => void): Promise
       await writeBlob(tournament, etag);
       return tournament;
     } catch (err) {
-      if (!isPreconditionFailed(err)) throw err;
+      if (!(err instanceof BlobPreconditionFailedError)) throw err;
       lastError = err;
       await new Promise((r) => setTimeout(r, 150 * (attempt + 1)));
     }
