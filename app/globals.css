@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+@theme {
+  --color-pool-50: #eefbfd;
+  --color-pool-100: #d5f3f8;
+  --color-pool-200: #b0e7f1;
+  --color-pool-300: #79d3e6;
+  --color-pool-400: #3bb7d3;
+  --color-pool-500: #1f9ab8;
+  --color-pool-600: #1d7d9b;
+  --color-pool-700: #1e657e;
+  --color-pool-800: #215468;
+  --color-pool-900: #204659;
+  --color-pool-950: #102d3c;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-pool-50 text-slate-900 antialiased;
+}
