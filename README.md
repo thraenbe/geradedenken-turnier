@@ -10,7 +10,7 @@ Ergebniseingabe unter **edit.geradedenken.com**.
 - ✏️ Ergebniseingabe mit PIN-Schutz (`edit.geradedenken.com` oder `/edit`)
 - 🏆 Platzierungsspiele (Platz 1 und Platz 3) mit Teamauswahl,
   Siegerbanner nach dem Finale
-- ⚙️ Wertung einstellbar (Standard Kanupolo: Sieg 2 Punkte, Remis 1)
+- ⚙️ Wertung einstellbar (Turnierwertung: Sieg 3 Punkte, Remis 1)
 
 ## Entwicklung
 

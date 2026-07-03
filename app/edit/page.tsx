@@ -237,7 +237,7 @@ function SettingsEditor({ tournament, onSaved }: { tournament: Tournament; onSav
           {state === "saving" ? "Speichert …" : state === "saved" ? "Gespeichert ✓" : "Speichern"}
         </button>
       </div>
-      <p className="mt-2 text-xs text-slate-400">Standard Kanupolo: 2 Punkte Sieg, 1 Punkt Unentschieden.</p>
+      <p className="mt-2 text-xs text-slate-400">Turnierwertung: 3 Punkte Sieg, 1 Punkt Unentschieden.</p>
     </div>
   );
 }

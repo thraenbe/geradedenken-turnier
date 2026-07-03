@@ -14,7 +14,7 @@ export function seedTournament(): Tournament {
   return {
     settings: {
       title: "Tübinger Kanupoloturnier 2026",
-      pointsWin: 2,
+      pointsWin: 3,
       pointsDraw: 1,
       days: [
         { day: 1, label: "Samstag", date: "04.07.2026" },
