@@ -21,7 +21,11 @@ async function readLocal(): Promise<ReadResult> {
     return { tournament: JSON.parse(raw), etag: null };
   } catch {
     const tournament = seedTournament();
-    await writeLocal(tournament);
+    try {
+      await writeLocal(tournament);
+    } catch {
+      // Read-only Dateisystem (z. B. Vercel ohne Blob-Token): Seed nur anzeigen.
+    }
     return { tournament, etag: null };
   }
 }
