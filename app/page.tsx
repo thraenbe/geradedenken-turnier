@@ -212,6 +212,7 @@ export default function Dashboard() {
                   <ul className="divide-y divide-slate-100">
                     {data.tournament.games
                       .filter((g) => g.day === day.day)
+                      .sort((a, b) => a.time.localeCompare(b.time))
                       .map((game) => (
                         <GameRow key={game.id} game={game} />
                       ))}

@@ -90,6 +90,7 @@ function GameEditor({
   const [scoreB, setScoreB] = useState(game.scoreB === null ? "" : String(game.scoreB));
   const [teamA, setTeamA] = useState(game.teamA);
   const [teamB, setTeamB] = useState(game.teamB);
+  const [time, setTime] = useState(game.time);
   const [state, setState] = useState<SaveState>("idle");
   const [message, setMessage] = useState<string | null>(null);
 
@@ -97,12 +98,21 @@ function GameEditor({
   const dirty =
     scoreA !== (game.scoreA === null ? "" : String(game.scoreA)) ||
     scoreB !== (game.scoreB === null ? "" : String(game.scoreB)) ||
+    time !== game.time ||
     (isPlacement && (teamA !== game.teamA || teamB !== game.teamB));
 
   async function save() {
     setState("saving");
     setMessage(null);
     try {
+      if (time !== game.time) {
+        const res = await fetch("/api/tournament", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ action: "time", id: game.id, time }),
+        });
+        if (!res.ok) throw new Error((await res.json()).error);
+      }
       if (isPlacement && (teamA !== game.teamA || teamB !== game.teamB)) {
         const res = await fetch("/api/tournament", {
           method: "POST",
@@ -136,10 +146,16 @@ function GameEditor({
 
   return (
     <li className="px-4 py-3">
-      <div className="flex items-center justify-between text-xs text-slate-400">
-        <span className="font-semibold text-pool-700">{game.time}</span>
+      <div className="flex items-center justify-between gap-2 text-xs text-slate-400">
+        <input
+          aria-label="Uhrzeit"
+          type="time"
+          value={time}
+          onChange={(e) => e.target.value && setTime(e.target.value)}
+          className="h-8 rounded-lg border border-slate-200 bg-white px-1.5 text-sm font-semibold text-pool-700 outline-none focus:border-pool-500"
+        />
         {label && <span className="rounded-full bg-pool-100 px-2 py-0.5 font-semibold text-pool-800">{label}</span>}
-        {game.ref && <span>Schiri: {game.ref}</span>}
+        {game.ref && <span className="truncate">Schiri: {game.ref}</span>}
       </div>
       <div className="mt-2 space-y-2">
         {[
@@ -302,8 +318,9 @@ export default function EditPage() {
                 <ul className="divide-y divide-slate-100">
                   {data.tournament.games
                     .filter((g) => g.day === day.day && g.type !== "break")
+                    .sort((a, b) => a.time.localeCompare(b.time))
                     .map((game) => (
-                      <GameEditor key={`${game.id}-${game.scoreA}-${game.scoreB}-${game.teamA}-${game.teamB}`} game={game} teams={data.tournament.teams} onSaved={setData} />
+                      <GameEditor key={`${game.id}-${game.scoreA}-${game.scoreB}-${game.teamA}-${game.teamB}-${game.time}`} game={game} teams={data.tournament.teams} onSaved={setData} />
                     ))}
                 </ul>
               </div>

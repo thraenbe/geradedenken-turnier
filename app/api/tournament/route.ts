@@ -63,6 +63,15 @@ export async function POST(req: NextRequest) {
           game.teamB = body.teamB;
           break;
         }
+        case "time": {
+          const game = t.games.find((g) => g.id === body.id);
+          if (!game) throw new Error("Spiel nicht gefunden");
+          if (typeof body.time !== "string" || !/^([01]\d|2[0-3]):[0-5]\d$/.test(body.time)) {
+            throw new Error("Ungültige Uhrzeit (HH:MM)");
+          }
+          game.time = body.time;
+          break;
+        }
         case "settings": {
           const win = Number(body.pointsWin);
           const draw = Number(body.pointsDraw);
